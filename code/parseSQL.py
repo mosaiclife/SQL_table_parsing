@@ -1,12 +1,31 @@
 # -*- coding: utf-8 -*-
+
+##############################################################################
+#   NAME:       parseSQL
+#   PURPOSE:    Get all table list from SQL file using python
+#
+#   REVISIONS:
+#   Ver        Date           Author           Description
+#  -------     ----------     ---------------  ------------------------------------
+#   0.1        2011-02-04     Eunpyo Hong      1. Created this File.
+#
+#   NOTES:	  
+#
+##############################################################################
+
+
 import re
 import glob
 import os
+import sys, getopt
 
-tableList = []  # 테이블 목록
-withTableList = [] # WITH문 테이블 리스트
-fileName = ''   # 파일 명
-fileList = []   # 파일 리스트(전체 SQL 파일)
+tableList = []      # 테이블 목록
+withTableList = []  # WITH문 테이블 리스트
+fileName = ''       # 파일 명
+fileList = []       # 파일 리스트(전체 SQL 파일)
+
+OUTPUT_FILE = ''       # 저장할 파일명
+INPUT_SQL = ''            # SQL 저장 폴더
 
 # 파일 읽기
 def readFile(file):
@@ -139,9 +158,8 @@ def writeFile(file, count, tableList):
     
 
 # 파일 리스트 얻기
-def getFileList():
-    for dirname, dirnames, filenames in os.walk('D:\SQL'):
-    #for dirname, dirnames, filenames in os.walk('TEST'):
+def getFileList(INPUT_SQL):
+    for dirname, dirnames, filenames in os.walk(INPUT_SQL):
     #디렉토리처리
         # for subdirname in dirnames:
             # name = os.path.join(dirname, subdirname)
@@ -158,9 +176,47 @@ def checkFile(file):
 # 배열 내 중복 데이터 제거
 def removeDup(tableList):
     return {}.fromkeys(tableList).keys() 
-        
-checkFile('test5.csv')
-getFileList()
+
+def printHelp():
+    print "Usage: parseSQL.py -s [SOURCE SQL FOLDER] -t [TARGET FILE NAME]"
+
+#**************************************
+#  Main Start
+#**************************************
+
+# Arg 처리
+try:
+    opts, arg = getopt.getopt(sys.argv[1:],"hs:t:",["source=","target="])   # -h는 인수 없고 -s, -t는 뒤에 인수 받음.
+    
+    # 인수 없을 때 처리
+    if len(opts) == 0:
+        printHelp()
+        sys.exit(2)
+except getopt.GetoptError:
+   printHelp()
+   sys.exit(2)
+
+for opt, arg in opts:
+    if opt == '-h':
+        printHelp()
+        sys.exit()
+    elif opt in ("-s", "--source"):
+        INPUT_SQL = arg
+    elif opt in ("-t", "--target"):
+        OUTPUT_FILE = arg
+
+#if len(sys.argv) != 2:
+#    printHelp()
+#    sys.exit(2)
+#else:
+#    FILENAME = 
+#    SQL = 
+
+# 파일 확인. 있으면 삭제
+checkFile(OUTPUT_FILE)
+
+# SQL 파일 리스트 받아오기
+getFileList(INPUT_SQL)
 
 count = 0
 
@@ -172,6 +228,6 @@ for i in fileList:
     # WITH 테이블 지우기
     tableList = list(set(tableList) - set(withTableList))
     
-    writeFile('test5.csv', count, tableList)
+    writeFile(OUTPUT_FILE, count, tableList)
     tableList = []
     withTableList = []
