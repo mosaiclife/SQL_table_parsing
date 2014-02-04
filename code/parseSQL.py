@@ -7,7 +7,7 @@
 #   REVISIONS:
 #   Ver        Date           Author           Description
 #  -------     ----------     ---------------  ------------------------------------
-#   0.1        2011-02-04     Eunpyo Hong      1. Created this File.
+#   0.1        2014-02-04     EunPyo Hong      1. Created this File.
 #
 #   NOTES:	  
 #
@@ -58,7 +58,6 @@ def readFile(file):
             
             # SELECT, WITH문 찾으면 ';' 만날때 까지 루프
             if (re.match('^SELECT', line) or re.match('^WITH', line)) and isLoopContinue != 1:
-            #if line.find('SELECT'):
                 isLoopContinue = 1
                 # WITH문으로 시작하면 WITH 테이블 명은 제외
                 if re.match('^WITH', line):
@@ -67,7 +66,6 @@ def readFile(file):
                     withTableList.append(line)
             
             # 다중 WITH문 처리
-            #if re.match(',[ |\t]*[A-Z0-9\._]*[ ]+AS[ |\(]*+[^A-Z0-9_\.]{1}', line):
             if re.match('.*,[ |\t]*[A-Za-z0-9\._]*[ ]+AS', line):
                 line = line[line.find(',')+ 1 :line.find('AS')].strip()
                 withTableList.append(line)
@@ -77,17 +75,8 @@ def readFile(file):
             if line.find(';') > -1 and isLoopContinue == 1:
                 break
             
-            #'..'으로 찾기
-            # if line.find('..') > -1 and isLoopContinue == 1:
-                #'..' 뒤에 나오는 테이블명 뽑아내기
-                # #tableList.append(re.search('[.]{2}([.A-Z_0-9]*)', line).group()[2:])
-                #tableList.append(re.search('[.]{2}[ ]*[.A-Z_0-9]*', line).group()[2:].strip())
-            #print line
             # FROM과 JOIN 뒤의 글짜 뽑기
             if ((re.match('[^A-Za-z0-9\.]*FROM', line) or line.find(' JOIN ') > -1 or line.find(' FROM ') > -1) and isLoopContinue == 1) or isBeforeFrom == 1 :
-                
-                
-                
                 if isBeforeFrom != 1:
                     # FROM이나 JOIN이후 테이블명이 않나오는 걸 처리
                     temp = re.search('(FROM|JOIN).*', line).group().strip()
@@ -107,9 +96,7 @@ def readFile(file):
                     if re.match('^\(', line.lstrip()):
                         isBeforeFrom = 0
                         continue
-                
-                
-                #print line
+
                 
                 # '..' 뒤 공백 제거
                 line = re.sub('\.\. *', '..', line)
@@ -121,8 +108,7 @@ def readFile(file):
                 
                 # 주석 및 필요 없는 문장 제거
                 line = re.search('^[A-Za-z.0-9_\xa1-\xfe/\[\]]*', line.lstrip()).group()
-                
-                #print line
+
                 
                 # '..' 있으면 앞부분 제거
                 if line.find('..') > -1:
@@ -135,7 +121,6 @@ def readFile(file):
                 # 공백 들어가지 않게 처리
                 elif len(line) > 0:
                     tableList.append(line)    
-                
 
                 isBeforeFrom = 0
         
@@ -204,13 +189,6 @@ for opt, arg in opts:
         INPUT_SQL = arg
     elif opt in ("-t", "--target"):
         OUTPUT_FILE = arg
-
-#if len(sys.argv) != 2:
-#    printHelp()
-#    sys.exit(2)
-#else:
-#    FILENAME = 
-#    SQL = 
 
 # 파일 확인. 있으면 삭제
 checkFile(OUTPUT_FILE)
